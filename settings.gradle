@@ -1,0 +1,4 @@
+rootProject.name = 'java-test-framework'
+include 'ui-test-automation'
+include 'api-test-automation'
+
