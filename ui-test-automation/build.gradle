@@ -10,8 +10,19 @@ repositories {
 }
 
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+    // Зависимости для тестирования
+    implementation 'org.seleniumhq.selenium:selenium-java:4.18.0' // Latest version of Selenium
+    implementation 'org.testng:testng:7.7.0' // Latest version of TestNG
+//    implementation 'org.junit.jupiter:junit-jupiter-api:5.10.0' // Latest version of JUnit
+//    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+
+    // Dependency for WebDriverManager
+    implementation 'io.github.bonigarcia:webdrivermanager:5.9.0' // Latest version of WebDriverManager
+
+    // Dependencies for Cucumber
+    implementation 'io.cucumber:cucumber-java:7.12.0' // Latest version of Cucumber
+//    implementation 'io.cucumber:cucumber-testng:7.12.0'
+
 }
 
 test {
