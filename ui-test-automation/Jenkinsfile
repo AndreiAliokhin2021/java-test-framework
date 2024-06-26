@@ -1,10 +1,31 @@
 pipeline {
     agent any
 
+    parameters {
+        string(name: 'BRANCH_NAME', defaultValue: 'main', description: 'branch to run')
+    }
+
+    environment {
+        PROPERTIES_FILE = 'pipeline.properties'
+    }
+
     stages {
+        stage('Load Properties') {
+            steps {
+                script {
+                    def props = readProperties file: PROPERTIES_FILE
+                    env.GIT_REPO_URL = props.GIT_REPO_URL
+                }
+            }
+        }
         stage('Checkout') {
             steps {
-                git 'https://your-repo-url.git'
+                script {
+                    checkout([$class: 'GitSCM', branches: [[name: "${params.BRANCH_NAME}"]],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [],
+                    userRemoteConfigs: [[url: "${env.GIT_REPO_URL}"]]])
+                }
             }
         }
         stage('Build') {
