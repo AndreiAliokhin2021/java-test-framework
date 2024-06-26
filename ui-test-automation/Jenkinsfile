@@ -1,0 +1,57 @@
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'BRANCH_NAME', defaultValue: 'main', description: 'brunch to run')
+    }
+
+    environment {
+        PROPERTIES_FILE = 'pipeline.properties'
+    }
+
+    stages {
+        stage('Load Properties') {
+            steps {
+                script {
+                    def props = readProperties file: "${env.PROPERTIES_FILE}"
+                    echo "Properties: ${props}"
+                    env.GIT_REPO_URL = props.GIT_REPO_URL
+                    echo "GIT_REPO_URL: ${env.GIT_REPO_URL}"
+                }
+            }
+        }
+        stage('Checkout') {
+            steps {
+                script {
+                    checkout([$class: 'GitSCM', branches: [[name: "*/${params.BRANCH_NAME}"]],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [],
+                    userRemoteConfigs: [[url: "${env.GIT_REPO_URL}"]]])
+                }
+            }
+        }
+        stage('Build') {
+            steps {
+                dir('ui-test-automation') {
+                    sh './gradlew clean build'
+                }
+            }
+        }
+        stage('Test') {
+            steps {
+                dir('ui-test-automation') {
+                    sh './gradlew test'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            dir('ui-test-automation') {
+                archiveArtifacts artifacts: '**/build/reports/**/*.html', allowEmptyArchive: true
+                junit 'build/test-results/test/*.xml'
+            }
+        }
+    }
+}
